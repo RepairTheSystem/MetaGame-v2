@@ -8,8 +8,12 @@ using namespace std;
 
 int main(){
     // Создаем объект игры
-    Game game(20, 10);
+    Room room1(20, 10);
+    room1.addBarrier(5, 5);
+    room1.addBarrier(6, 5);
 
+    Game game(room1.getWidth(), room1.getHeight());
+    game.setCurrentRoom(room1);
     // Основной цикл игры
     while (true) {
         game.render();

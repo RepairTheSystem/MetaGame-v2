@@ -1,3 +1,5 @@
+using namespace std;
+
 #ifndef Cell
 #define Cell
 class GameObject {
@@ -43,16 +45,67 @@ public:
 };
 
 class Barrier : public GameObject {
+public:
     Barrier(int x, int y) : GameObject(x, y, '#') {};
 };
 
 class Enemy : public GameObject {
+public:
     Enemy(int x, int y) : GameObject(x, y, 'E') {};
 };
 
 class Room {
+private:
     // Класс, представляющий комнату в игре
-    // Здесь вы можете хранить информацию о комнате, ее размере, объектах и т. д.
+    // Здесь будем хранить информацию о комнате, ее размере, объектах и т. д.
+    int width;
+    int height;
+    vector<vector<char>> roomMap;
+    vector<Barrier> barriers;
+    vector<Enemy> enemies;
+public:
+    Room(int width, int height) : width(width), height(height), barriers(), enemies() {
+        // Создадим комнату заданного размера   
+        roomMap = vector<vector<char>>(height, vector<char>(width, '.'));
+    }
+
+    // Методы для добавления объектов Barrier и Enemy в комнату
+    void addBarrier(int x, int y) {
+        barriers.push_back(Barrier(x, y));
+    }
+
+    void addEnemy(int x, int y) {
+        enemies.push_back(Enemy(x, y));
+    }
+
+    // Методы для отображения объектов в комнате
+    vector<vector<char>> render() {
+        // Очистите карту комнаты
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                roomMap[y][x] = '.';
+            }
+        }
+
+        for (const auto& barrier : barriers) {
+            // Отрисовать объекты Barrier в комнате
+            roomMap[barrier.getY()][barrier.getX()] = barrier.getSymbol();
+        }
+
+        for (const auto& enemy : enemies) {
+            // Отрисовать объекты Enemy в комнате
+            roomMap[enemy.getY()][enemy.getX()] = enemy.getSymbol();
+        }
+        return roomMap;
+    }
+
+    int getWidth() const {
+        return width;
+    }
+
+    int getHeight() const {
+        return height;
+    }
 };
 
 #endif
