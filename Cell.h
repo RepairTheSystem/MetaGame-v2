@@ -52,6 +52,13 @@ public:
 class Enemy : public GameObject {
 public:
     Enemy(int x, int y) : GameObject(x, y, 'E') {};
+
+    // Проверяем, не подошел ли игрок слишком близко к врагу
+    bool isEnemyClose(Player &player){
+        if ((abs(getX() - player.getX()) + abs(getY() - player.getY())) <= 1)
+            return true;
+        return false;
+    }
 };
 
 class Room {
@@ -76,6 +83,10 @@ public:
 
     void addEnemy(int x, int y) {
         enemies.push_back(Enemy(x, y));
+    }
+
+    vector<Enemy> getEnemies(){
+        return enemies;
     }
 
     // Методы для отображения объектов в комнате

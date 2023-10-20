@@ -12,6 +12,8 @@ int main(){
     room1.addBarrier(5, 5);
     room1.addBarrier(6, 5);
 
+    room1.addEnemy(1, 5);
+
     Game game(room1.getWidth(), room1.getHeight());
     game.setCurrentRoom(room1);
     // Основной цикл игры

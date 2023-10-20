@@ -39,7 +39,19 @@ public:
         }
 
         map[player.getY()][player.getX()] = player.getSymbol();
-
+        
+        // Перебираем врагов и проверяем, не слишком ли они близко к игроку
+        for (Enemy& enemy : currentRoom->getEnemies()) {
+            if (enemy.isEnemyClose(player)) {
+                // Враг слишком близко к игроку, меняем символ и останавливаем игру
+                map[player.getY()][player.getX()] = 'D';
+                cout << "Game Over!" << endl;
+                
+                cin.get();
+                exit(0); // Останавливаем игру
+            }
+        }
+        
         // Отобразите карту игры
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -48,7 +60,7 @@ public:
             cout << endl;
         }
         
-        PlayerInput(player, width, height);
+        PlayerInput(player, width, height, map);
         Sleep(300);
     }
 };
