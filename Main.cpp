@@ -7,13 +7,17 @@
 using namespace std;
 
 int main(){
-    // Создаем объект игры
+    // Создаем комнату игры
     Room room1(20, 10);
+
+    // Добавляем в нее объекты
     room1.addBarrier(5, 5);
     room1.addBarrier(6, 5);
 
-    room1.addEnemy(1, 5);
+    room1.addMonster(1, 5);
+    room1.addMonster(3, 5);
 
+    // Создаем игровое поле на основе созданной комнаты
     Game game(room1.getWidth(), room1.getHeight());
     game.setCurrentRoom(room1);
     // Основной цикл игры

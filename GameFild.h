@@ -41,7 +41,7 @@ public:
         map[player.getY()][player.getX()] = player.getSymbol();
         
         // Перебираем врагов и проверяем, не слишком ли они близко к игроку
-        for (Enemy& enemy : currentRoom->getEnemies()) {
+        for (Enemy enemy : currentRoom->getEnemies()) {
             if (enemy.isEnemyClose(player)) {
                 // Враг слишком близко к игроку, меняем символ и останавливаем игру
                 map[player.getY()][player.getX()] = 'D';
@@ -52,6 +52,11 @@ public:
             }
         }
         
+        // Применяем рандомное передвижение монстров
+        for(Monster* monster : currentRoom->getMonsters()){
+            monster->moveRandom();
+        }
+
         // Отобразите карту игры
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {

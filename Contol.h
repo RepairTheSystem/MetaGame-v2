@@ -5,9 +5,9 @@
 #ifndef Control
 #define Control
 
-void moveCheck(Player& player, int x_offset, int y_offset, void (Player::*moveFunction)(), int width, int height, vector<vector<char>> map) {
-    int next_y = player.getY() + y_offset;
-    int next_x = player.getX() + x_offset;
+void moveCheck(Player& player, int xOffset, int yOffset, void (Player::*moveFunction)(), int width, int height, vector<vector<char>> map) {
+    int next_y = player.getY() + yOffset;
+    int next_x = player.getX() + xOffset;
     bool next_cell_access = true;
 
     // Проверка на выпадение за карту

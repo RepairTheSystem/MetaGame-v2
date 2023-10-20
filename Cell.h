@@ -1,3 +1,4 @@
+#
 using namespace std;
 
 #ifndef Cell
@@ -51,13 +52,43 @@ public:
 
 class Enemy : public GameObject {
 public:
-    Enemy(int x, int y) : GameObject(x, y, 'E') {};
+    Enemy(int x, int y, char symbol) : GameObject(x, y, symbol) {};
 
     // Проверяем, не подошел ли игрок слишком близко к врагу
     bool isEnemyClose(Player &player){
         if ((abs(getX() - player.getX()) + abs(getY() - player.getY())) <= 1)
             return true;
         return false;
+    }
+};
+
+class Tower : public Enemy {
+public: 
+    Tower(int x, int y): Enemy(x, y, 'T') {};
+};
+
+class Monster : public Enemy {
+public:
+    Monster(int x, int y) : Enemy(x, y, 'M') {}
+
+    // Метод для случайного движения монстра
+    void moveRandom() {
+        // Будем генерировать случайное число от 1 до 3-х, и в зависимости от числа
+        // Будем моделировать шаги монстра
+        int moveSeed = rand() % 3;
+        if(moveSeed == 0)
+            moveUp();
+        if(moveSeed == 1)
+            moveDown();
+    }
+    void moveUp() { 
+        int currentY = getY();
+        if (currentY >= 1)
+            setY(currentY-1); 
+    }
+    void moveDown() { 
+        int currentY = getY();
+        setY(currentY+1); 
     }
 };
 
@@ -69,9 +100,11 @@ private:
     int height;
     vector<vector<char>> roomMap;
     vector<Barrier> barriers;
+    vector<Monster> monsters;
+    vector<Tower> towers;
     vector<Enemy> enemies;
 public:
-    Room(int width, int height) : width(width), height(height), barriers(), enemies() {
+    Room(int width, int height) : width(width), height(height), barriers(), enemies(), towers(), monsters(){
         // Создадим комнату заданного размера   
         roomMap = vector<vector<char>>(height, vector<char>(width, '.'));
     }
@@ -81,11 +114,23 @@ public:
         barriers.push_back(Barrier(x, y));
     }
 
-    void addEnemy(int x, int y) {
-        enemies.push_back(Enemy(x, y));
+    void addTower(int x, int y) {
+        Tower tower(x, y);
+        towers.push_back(tower);
     }
 
+    void addMonster(int x, int y) {
+        Monster monster(x, y);
+        monsters.push_back(monster);
+    }
+
+
+    // Передаем всех злых существ
     vector<Enemy> getEnemies(){
+        // Объединяем врагов из разных векторов
+        enemies.clear(); // Очищаем текущий вектор
+        enemies.insert(enemies.end(), towers.begin(), towers.end());
+        enemies.insert(enemies.end(), monsters.begin(), monsters.end());
         return enemies;
     }
 
@@ -117,6 +162,15 @@ public:
     int getHeight() const {
         return height;
     }
+
+    // Метод передачи указателей на всех монстров в комнате 
+    vector<Monster*> getMonsters() {
+        vector<Monster*> monsterPointers;
+        for (Monster& monster : monsters) {
+            monsterPointers.push_back(&monster);
+        }
+    return monsterPointers;
+}
 };
 
 #endif
