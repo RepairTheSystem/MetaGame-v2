@@ -33,7 +33,7 @@ public:
     void render() {
         system("cls");
         // Отрисовываем карту игры и игрока
-        // Отобразите текущую комнату и её содержимое
+        // Отображаем текущую комнату и ее наполнение 
         if (currentRoom != nullptr) {
             map = currentRoom->render();
         }
