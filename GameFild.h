@@ -56,6 +56,9 @@ public:
         currentRoom->updateBullet();
         currentRoom->updateRocket();
 
+        // Обновляем сундуки 
+        currentRoom->updateChest(player);
+
         // Применяем рандомное передвижение монстров
         for (Monster* monster : currentRoom->getMonsters()) {
             monster->moveRandom();
@@ -68,7 +71,8 @@ public:
             }
             cout << endl;
         }
-        
+        // Выводим счет игрока
+        cout << "Score: " << player.getScore();
         PlayerInput(player, currentRoom);
         Sleep(300);
     }

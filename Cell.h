@@ -22,9 +22,10 @@ public:
     
 };
 class Player : public GameObject {
+private: int score;
     // Класс игрока - наследник базового класса GameObject
 public:
-    Player(int x, int y) : GameObject(x, y, 'P') {}
+    Player(int x, int y) : GameObject(x, y, 'P'), score(0) {};
     // Добавьте здесь методы для управления игроком, такие как move, attack, и т. д.
     // Методы для обновления позиции игрока
     void moveUp() { 
@@ -43,11 +44,38 @@ public:
         int currentX = getX();
         setX(currentX-1); 
     }
+    int getScore() const {
+        return score;
+    }
+    void addScore(int givenScore){
+        int newScore = givenScore + getScore();
+        score = newScore;
+    }
 };
 
 class Barrier : public GameObject {
 public:
     Barrier(int x, int y) : GameObject(x, y, '#') {};
+};
+
+class Chest : public GameObject {
+private:
+    int score;
+public:
+    Chest(int x, int y, int score) : GameObject(x, y, 'C'), score(score) {};
+
+    bool isPlayerClose (Player& player) {
+        int playerX = player.getX();
+        int playerY = player.getY();
+
+        if (getX() == playerX && getY() == playerY)
+            return true;
+        return false;
+    }
+
+    int getScore() {
+        return score;
+    }
 };
 
 class Enemy : public GameObject {
@@ -161,9 +189,10 @@ private:
     vector<Tower> towers;
     vector<Bullet> bullets;
     vector<Rocket> rockets;
+    vector<Chest> chests;
 public:
     Room(int width, int height) : width(width), height(height), barriers(), enemies(),
-    towers(), monsters(), bullets(), rockets() {
+    towers(), monsters(), bullets(), rockets(), chests() {
         // Создадим комнату заданного размера   
         roomMap = vector<vector<char>>(height, vector<char>(width, '.'));
     }
@@ -196,6 +225,11 @@ public:
         Rocket rocket(x, y);
         rockets.push_back(rocket);
         projectiles.push_back(rocket);
+    }
+
+    void addChest (int x, int y, int cost){
+        Chest chest(x, y, cost);
+        chests.push_back(chest);
     }
 
     // Передаем всех злых существ
@@ -235,48 +269,11 @@ public:
         for (const auto& shot : rockets) {
             roomMap[shot.getY()][shot.getX()] = shot.getSymbol();
         }
-
-        /* if (true){
-            // Отрисовать объекты Rocket в комнате
-            auto it = rockets.begin(); // Это объявление оставьте как есть
-
-            // Создадим итератор, который будет проверять нужно ли отрисовывать ракету
-            // или удалить ее
-            while (it != rockets.end()) {
-                if (!it->isAlive()) {
-                    it = rockets.erase(it); // Удаляем неактивные ракеты и получаем итератор на следующий элемент
-                } 
-                else {
-                    roomMap[it->getY()][it->getX()] = it->getSymbol();
-                    ++it; // Переходим к следующему элементу
-                }
-            } 
-        }
         
-        auto bulletIt = bullets.begin();
-        while (bulletIt != bullets.end()) {
-        
-        auto monsterIt = monsters.begin();
-        while (monsterIt != monsters.end()) {
-            if (bulletIt->isHitMonster(*monsterIt)) {
-                // Уничтожьте монстра
-                monsterIt = monsters.erase(monsterIt);
-                // Уничтожьте пулю
-                bulletIt = bullets.erase(bulletIt);
-            } 
-            else {
-                ++monsterIt;
-            }
+        // Отрисовать объекты Chest в комнате
+        for (const auto& chest : chests) {
+            roomMap[chest.getY()][chest.getX()] = chest.getSymbol();
         }
-
-        if (!bulletIt->isAlive()) {
-            bulletIt = bullets.erase(bulletIt); // Удаляем неактивные пули
-        } else {
-            roomMap[bulletIt->getY()][bulletIt->getX()] = bulletIt->getSymbol();
-            ++bulletIt;
-        }
-    } */
-        
 
         return roomMap;
     }
@@ -355,6 +352,17 @@ public:
         }
     }
 
+    void updateChest(Player& player) {
+        for (auto chestIt = chests.begin(); chestIt != chests.end();){
+            if (chestIt->isPlayerClose(player)){
+                player.addScore(chestIt->getScore());
+                chestIt = chests.erase(chestIt);
+            }
+            else{
+                ++chestIt;
+            }
+        }
+    }
 
     int getWidth() const {
         return width;
@@ -372,7 +380,8 @@ public:
         }
         return monsterPointers;
     }
-
+    
+    /* 
     // Передаем все указатели на снаряды на карте 
     vector<Projectile*> getProjectiles() {
         vector<Projectile*> shotPointers;
@@ -384,7 +393,7 @@ public:
         }
 
         return shotPointers;
-    }
+    } */
 
 };
 
