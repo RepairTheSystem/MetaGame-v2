@@ -1,4 +1,4 @@
-#
+#include <vector>
 using namespace std;
 
 #ifndef Cell
@@ -92,6 +92,27 @@ public:
     }
 };
 
+class Projectile : public GameObject {
+public:
+    Projectile (int x, int y, char symbol) : GameObject(x, y, symbol) {};
+    void moveUp() { 
+        int currentY = getY();
+        if (currentY >= 1)
+            setY(currentY-1); 
+    }
+};
+
+class Bullet : public Projectile {
+public:
+    Bullet(int x, int y) : Projectile(x, y, 'B') {};
+    
+};
+
+class Rocket : public Projectile {
+public:
+    Rocket(int x, int y) : Projectile(x, y, 'R') {};
+    
+};
 class Room {
 private:
     // Класс, представляющий комнату в игре
@@ -100,30 +121,47 @@ private:
     int height;
     vector<vector<char>> roomMap;
     vector<Barrier> barriers;
+    vector<Projectile> projectiles;
+    vector<Enemy> enemies;
     vector<Monster> monsters;
     vector<Tower> towers;
-    vector<Enemy> enemies;
+    vector<Bullet> bullets;
+    vector<Rocket> rockets;
 public:
     Room(int width, int height) : width(width), height(height), barriers(), enemies(), towers(), monsters(){
         // Создадим комнату заданного размера   
         roomMap = vector<vector<char>>(height, vector<char>(width, '.'));
     }
 
-    // Методы для добавления объектов Barrier и Enemy в комнату
+    // Методы для добавления объектов Barrier в комнату
     void addBarrier(int x, int y) {
         barriers.push_back(Barrier(x, y));
     }
 
+    // Методы для добавления объектов Tower в комнату
     void addTower(int x, int y) {
         Tower tower(x, y);
         towers.push_back(tower);
     }
 
+    // Методы для добавления объектов Monster в комнату
     void addMonster(int x, int y) {
         Monster monster(x, y);
         monsters.push_back(monster);
     }
 
+    // Методы для добавления объектов Bullet в комнату
+    void addBullet (int x, int y) {
+        Bullet bullet(x, y);
+        bullets.push_back(bullet);
+        projectiles.push_back(bullet);
+    }
+    
+    void addRocket (int x, int y) {
+        Rocket rocket(x, y);
+        rockets.push_back(rocket);
+        projectiles.push_back(rocket);
+    }
 
     // Передаем всех злых существ
     vector<Enemy> getEnemies(){
@@ -143,15 +181,26 @@ public:
             }
         }
 
+        // Отрисовать объекты Barrier в комнате
         for (const auto& barrier : barriers) {
-            // Отрисовать объекты Barrier в комнате
             roomMap[barrier.getY()][barrier.getX()] = barrier.getSymbol();
         }
 
+        // Отрисовать объекты Enemy в комнате
         for (const auto& enemy : enemies) {
-            // Отрисовать объекты Enemy в комнате
             roomMap[enemy.getY()][enemy.getX()] = enemy.getSymbol();
         }
+        
+        // Отрисовать объекты Bullet в комнате
+        for (const auto& projectile : bullets) {
+            roomMap[projectile.getY()][projectile.getX()] = projectile.getSymbol();
+        }
+        
+        // Отрисовать объекты Rocket в комнате
+        for (const auto& projectile : rockets) {
+            roomMap[projectile.getY()][projectile.getX()] = projectile.getSymbol();
+        }
+
         return roomMap;
     }
 
@@ -169,8 +218,22 @@ public:
         for (Monster& monster : monsters) {
             monsterPointers.push_back(&monster);
         }
-    return monsterPointers;
-}
+        return monsterPointers;
+    }
+
+    // Передаем все указатели на снаряды на карте 
+    vector<Projectile*> getProjectiles() {
+        vector<Projectile*> shotPointers;
+        for (Projectile& shot : bullets) {
+            shotPointers.push_back(&shot);
+        }
+        for (Projectile& shot : rockets) {
+            shotPointers.push_back(&shot);
+        }
+
+        return shotPointers;
+    }
+
 };
 
 #endif

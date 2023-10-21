@@ -52,8 +52,12 @@ public:
             }
         }
         
+        for (Projectile* shot : currentRoom->getProjectiles()) {
+            shot->moveUp();
+        }
+
         // Применяем рандомное передвижение монстров
-        for(Monster* monster : currentRoom->getMonsters()){
+        for (Monster* monster : currentRoom->getMonsters()) {
             monster->moveRandom();
         }
 
@@ -65,11 +69,9 @@ public:
             cout << endl;
         }
         
-        PlayerInput(player, width, height, map);
+        PlayerInput(player, currentRoom);
         Sleep(300);
     }
 };
-
-
 
 #endif
