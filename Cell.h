@@ -113,12 +113,39 @@ class Bullet : public Projectile {
 public:
     Bullet(int x, int y) : Projectile(x, y, 'B') {};
     
+    bool isHitMonster(Monster& monster) {
+        int bulletX = getX();
+        int bulletY = getY();
+        int monsterX = monster.getX();
+        int monsterY = monster.getY();
+
+        // Проверьте, если координаты пули и монстра совпадают
+        if (bulletX == monsterX && bulletY == monsterY) {
+            return true;
+        }
+
+        return false;
+    }
+
 };
 
 class Rocket : public Projectile {
 public:
     Rocket(int x, int y) : Projectile(x, y, 'R') {};
     
+    bool isHitTower(Tower& tower) {
+        int rocketX = getX();
+        int rocketY = getY();
+        int monsterX = tower.getX();
+        int monsterY = tower.getY();
+
+        // Проверьте, если координаты пули и монстра совпадают
+        if (rocketX == monsterX && rocketY == monsterY) {
+            return true;
+        }
+
+        return false;
+    }
 };
 class Room {
 private:
@@ -198,7 +225,18 @@ public:
         for (const auto& enemy : enemies) {
             roomMap[enemy.getY()][enemy.getX()] = enemy.getSymbol();
         }
-        if (true){
+
+        // Отрисовать объекты Bullet в комнате
+        for (const auto& shot : bullets) {
+            roomMap[shot.getY()][shot.getX()] = shot.getSymbol();
+        }
+
+        // Отрисовать объекты Rocket в комнате
+        for (const auto& shot : rockets) {
+            roomMap[shot.getY()][shot.getX()] = shot.getSymbol();
+        }
+
+        /* if (true){
             // Отрисовать объекты Rocket в комнате
             auto it = rockets.begin(); // Это объявление оставьте как есть
 
@@ -215,23 +253,108 @@ public:
             } 
         }
         
-        // Отрисовать объекты Bullet в комнате
-        auto it = bullets.begin();
-        // Создадим итератор, который будет проверять нужно ли отрисовывать пулю
-        // или удалить ее
-        while (it != bullets.end()) {
-            if (!it->isAlive()) {
-                it = bullets.erase(it); // Удаляем неактивные пули и получаем итератор на следующий элемент
+        auto bulletIt = bullets.begin();
+        while (bulletIt != bullets.end()) {
+        
+        auto monsterIt = monsters.begin();
+        while (monsterIt != monsters.end()) {
+            if (bulletIt->isHitMonster(*monsterIt)) {
+                // Уничтожьте монстра
+                monsterIt = monsters.erase(monsterIt);
+                // Уничтожьте пулю
+                bulletIt = bullets.erase(bulletIt);
             } 
             else {
-                roomMap[it->getY()][it->getX()] = it->getSymbol();
-                ++it; // Переходим к следующему элементу
+                ++monsterIt;
             }
         }
-    
+
+        if (!bulletIt->isAlive()) {
+            bulletIt = bullets.erase(bulletIt); // Удаляем неактивные пули
+        } else {
+            roomMap[bulletIt->getY()][bulletIt->getX()] = bulletIt->getSymbol();
+            ++bulletIt;
+        }
+    } */
+        
 
         return roomMap;
     }
+
+    // Метод для проверки состояния пули - не попала ли она в монстра, или не вышла ли за карту
+    void updateBullet() {
+        for (auto bulletIt = bullets.begin(); bulletIt != bullets.end();) {
+            bulletIt->moveUp();
+
+            for (auto monsterIt = monsters.begin(); monsterIt != monsters.end();) {
+                if (bulletIt->isHitMonster(*monsterIt)) {
+                    // Уничтожаем монстра
+                    monsterIt = monsters.erase(monsterIt);
+
+                    // Уничтожаем пулю
+                    bulletIt = bullets.erase(bulletIt);
+
+                    // Если оба итератора достигли конца, выходим из обоих циклов
+                    if (monsterIt == monsters.end() && bulletIt == bullets.end())
+                        return;
+                } 
+                else {
+                    // Двигаем итератор монстра
+                    ++monsterIt;
+                }
+            }
+            // Если закончились пули - заканчиваем цикл
+            if (bulletIt == bullets.end()) {
+                return;
+            }
+            // Удаляем пулю из массива, если она мертва
+            else if (!bulletIt->isAlive()) {
+                bulletIt = bullets.erase(bulletIt);
+            } 
+            else {
+                // Двигаем итератор пули
+                ++bulletIt;
+            }
+        }
+    }   
+
+    // Метод для проверки состояния ракеты - не попала она в башню, или не вышла ли за карту
+    void updateRocket() {
+        for (auto rocketIt = rockets.begin(); rocketIt != rockets.end();) {
+            rocketIt->moveUp();
+
+            for (auto towerIt = towers.begin(); towerIt != towers.end();) {
+                if (rocketIt->isHitTower(*towerIt)) {
+                    // Уничтожаем башню
+                    towerIt = towers.erase(towerIt);
+
+                    // Уничтожаем ракету
+                    rocketIt = rockets.erase(rocketIt);
+
+                    // Если оба итератора достигли конца, выходим из обоих циклов
+                    if (towerIt == towers.end() && rocketIt == rockets.end())
+                        return;
+                }
+                else {
+                    // Двигаем итератор башни
+                    ++towerIt;
+                }
+            }
+            // Если закончились ракеты - заканчиваем цикл
+            if (rocketIt == rockets.end()) {
+                return;
+            }
+            // Удаляем ракету из массива, если она мертва
+            else if (!rocketIt->isAlive()) {
+                rocketIt = rockets.erase(rocketIt);
+            } 
+            else {
+                // Двигаем итератор ракеты
+                ++rocketIt;
+            }
+        }
+    }
+
 
     int getWidth() const {
         return width;

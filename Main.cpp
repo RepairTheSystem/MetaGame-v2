@@ -16,6 +16,7 @@ int main(){
 
     room1.addMonster(1, 5);
     room1.addMonster(3, 5);
+    room1.addTower(6, 2);
 
     // Создаем игровое поле на основе созданной комнаты
     Game game(room1.getWidth(), room1.getHeight());

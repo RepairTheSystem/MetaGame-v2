@@ -52,9 +52,9 @@ public:
             }
         }
         
-        for (Projectile* shot : currentRoom->getProjectiles()) {
-            shot->moveUp();
-        }
+        // Передвигаем выстрелы вверх
+        currentRoom->updateBullet();
+        currentRoom->updateRocket();
 
         // Применяем рандомное передвижение монстров
         for (Monster* monster : currentRoom->getMonsters()) {
