@@ -93,12 +93,19 @@ public:
 };
 
 class Projectile : public GameObject {
+private:
+    bool isAliveV;
 public:
-    Projectile (int x, int y, char symbol) : GameObject(x, y, symbol) {};
+    Projectile (int x, int y, char symbol) : GameObject(x, y, symbol), isAliveV(true) {};
     void moveUp() { 
         int currentY = getY();
-        if (currentY >= 1)
+        if (currentY >= 1 and isAlive())
             setY(currentY-1); 
+        else
+            isAliveV = false;
+    }
+    bool isAlive() const {
+        return isAliveV;
     }
 };
 
@@ -128,7 +135,8 @@ private:
     vector<Bullet> bullets;
     vector<Rocket> rockets;
 public:
-    Room(int width, int height) : width(width), height(height), barriers(), enemies(), towers(), monsters(){
+    Room(int width, int height) : width(width), height(height), barriers(), enemies(),
+    towers(), monsters(), bullets(), rockets() {
         // Создадим комнату заданного размера   
         roomMap = vector<vector<char>>(height, vector<char>(width, '.'));
     }
@@ -190,16 +198,37 @@ public:
         for (const auto& enemy : enemies) {
             roomMap[enemy.getY()][enemy.getX()] = enemy.getSymbol();
         }
+        if (true){
+            // Отрисовать объекты Rocket в комнате
+            auto it = rockets.begin(); // Это объявление оставьте как есть
+
+            // Создадим итератор, который будет проверять нужно ли отрисовывать ракету
+            // или удалить ее
+            while (it != rockets.end()) {
+                if (!it->isAlive()) {
+                    it = rockets.erase(it); // Удаляем неактивные ракеты и получаем итератор на следующий элемент
+                } 
+                else {
+                    roomMap[it->getY()][it->getX()] = it->getSymbol();
+                    ++it; // Переходим к следующему элементу
+                }
+            } 
+        }
         
         // Отрисовать объекты Bullet в комнате
-        for (const auto& projectile : bullets) {
-            roomMap[projectile.getY()][projectile.getX()] = projectile.getSymbol();
+        auto it = bullets.begin();
+        // Создадим итератор, который будет проверять нужно ли отрисовывать пулю
+        // или удалить ее
+        while (it != bullets.end()) {
+            if (!it->isAlive()) {
+                it = bullets.erase(it); // Удаляем неактивные пули и получаем итератор на следующий элемент
+            } 
+            else {
+                roomMap[it->getY()][it->getX()] = it->getSymbol();
+                ++it; // Переходим к следующему элементу
+            }
         }
-        
-        // Отрисовать объекты Rocket в комнате
-        for (const auto& projectile : rockets) {
-            roomMap[projectile.getY()][projectile.getX()] = projectile.getSymbol();
-        }
+    
 
         return roomMap;
     }
