@@ -1,5 +1,6 @@
 #include <vector>
-#include <windows.h>
+#include <iostream>
+#include <windows.h> // Это необходимо для корректного управления, без использования сторонних библиотек
 #include "Cell.h"
 
 #ifndef Control
@@ -14,34 +15,37 @@ void moveCheck(Player& player, int xOffset, int yOffset, void (Player::*moveFunc
     vector<vector<char>> map = room->render();
 
     // Проверка на выпадение за карту
-    if (next_y >= height || next_y < 0 || next_x >= width || next_x < 0)
+    if ((next_y <= height && next_y >= 0 && next_x <= width && next_x >= 0) == false)
         next_cell_access = false;
     
     // Проверка на попытку пройти через препятствие 
     if (map[next_y][next_x] == '#')
         next_cell_access = false;
 
+    // Двигаем игрока, если все условия выполнены
     if (next_cell_access)
         (player.*moveFunction)();
 }
 
 void PlayerInput(Player& player, Room* room) {
-    if (GetAsyncKeyState(VK_UP) & 0x8000) {
+    // Считываем передвижение игрока на стрелки
+    if (GetAsyncKeyState(VK_UP)) {
         moveCheck(player, 0, -1, &Player::moveUp, room);
     }
-    if (GetAsyncKeyState(VK_DOWN) & 0x8000) {
+    if (GetAsyncKeyState(VK_DOWN)) {
         moveCheck(player, 0, 1, &Player::moveDown, room);
     }
-    if (GetAsyncKeyState(VK_LEFT) & 0x8000) {
+    if (GetAsyncKeyState(VK_LEFT)) {
         moveCheck(player, -1, 0, &Player::moveLeft, room);
     }
-    if (GetAsyncKeyState(VK_RIGHT) & 0x8000) {
+    if (GetAsyncKeyState(VK_RIGHT)) {
         moveCheck(player, 1, 0, &Player::moveRight, room);
     }
-    if (GetAsyncKeyState('B') & 0x8000) {
+    // При нажатии на 'B' или 'R' создаем выстрел
+    if (GetAsyncKeyState('B')) {
         room->addBullet(player.getX(), player.getY()-1);
     }
-    if (GetAsyncKeyState('R') & 0x8000) {
+    if (GetAsyncKeyState('R')) {
         room->addRocket(player.getX(), player.getY()-1);
     }
 }

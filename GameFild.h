@@ -1,6 +1,6 @@
 #include <vector>
 #include <iostream>
-#include <windows.h>
+#include <thread>
 
 #include "Cell.h"
 #include "Contol.h"
@@ -19,7 +19,7 @@ private:
     Player player;
     Room* currentRoom;
 public:
-    Game(int width, int height) : width(width), height(height), player(0, 0) {
+    Game(int width, int height) : width(width), height(height), player(1, 1) {
         // Создаем карту игры
         map = vector<vector<char>>(height, vector<char>(width, '.'));
         currentRoom = nullptr;
@@ -64,7 +64,7 @@ public:
             monster->moveRandom();
         }
 
-        // Отобразите карту игры
+        // Отобразим карту игры
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 cout << map[y][x];
@@ -74,7 +74,7 @@ public:
         // Выводим счет игрока
         cout << "Score: " << player.getScore();
         PlayerInput(player, currentRoom);
-        Sleep(300);
+        this_thread::sleep_for(chrono::milliseconds(300));
     }
 };
 

@@ -21,12 +21,11 @@ public:
     void setY(int y) { this->y = y; }
     
 };
+// Класс игрока
 class Player : public GameObject {
 private: int score;
-    // Класс игрока - наследник базового класса GameObject
 public:
     Player(int x, int y) : GameObject(x, y, 'P'), score(0) {};
-    // Добавьте здесь методы для управления игроком, такие как move, attack, и т. д.
     // Методы для обновления позиции игрока
     void moveUp() { 
         int currentY = getY();
@@ -44,6 +43,7 @@ public:
         int currentX = getX();
         setX(currentX-1); 
     }
+    // Методы для работы с счетом игрока
     int getScore() const {
         return score;
     }
@@ -53,17 +53,20 @@ public:
     }
 };
 
+// Класс Препятствий
 class Barrier : public GameObject {
 public:
     Barrier(int x, int y) : GameObject(x, y, '#') {};
 };
 
+// Класс Сундуков
 class Chest : public GameObject {
 private:
     int score;
 public:
     Chest(int x, int y, int score) : GameObject(x, y, 'C'), score(score) {};
 
+    // Проверка на наличие игрока в клетке
     bool isPlayerClose (Player& player) {
         int playerX = player.getX();
         int playerY = player.getY();
@@ -78,6 +81,7 @@ public:
     }
 };
 
+// "Абстрактный" класс врагов
 class Enemy : public GameObject {
 public:
     Enemy(int x, int y, char symbol) : GameObject(x, y, symbol) {};
@@ -90,11 +94,13 @@ public:
     }
 };
 
+// Класс Башен - одного из возмжоных врагов
 class Tower : public Enemy {
 public: 
     Tower(int x, int y): Enemy(x, y, 'T') {};
 };
 
+// Класс монстров - одного из возможных врагов
 class Monster : public Enemy {
 public:
     Monster(int x, int y) : Enemy(x, y, 'M') {}
@@ -120,6 +126,7 @@ public:
     }
 };
 
+// "Абстрактный" класс выстрелов 
 class Projectile : public GameObject {
 private:
     bool isAliveV;
@@ -137,17 +144,19 @@ public:
     }
 };
 
+// Класс Пуль - одного из вида выстрелов
 class Bullet : public Projectile {
 public:
     Bullet(int x, int y) : Projectile(x, y, 'B') {};
     
+    // Метод проверки на близость пули к монстру
     bool isHitMonster(Monster& monster) {
         int bulletX = getX();
         int bulletY = getY();
         int monsterX = monster.getX();
         int monsterY = monster.getY();
 
-        // Проверьте, если координаты пули и монстра совпадают
+        // Если координаты пули и монстра совпадают
         if (bulletX == monsterX && bulletY == monsterY) {
             return true;
         }
@@ -157,17 +166,19 @@ public:
 
 };
 
+// Класс Ракет - одного из видов выстрелов 
 class Rocket : public Projectile {
 public:
     Rocket(int x, int y) : Projectile(x, y, 'R') {};
     
+    // Метод проверки на близость к башне
     bool isHitTower(Tower& tower) {
         int rocketX = getX();
         int rocketY = getY();
         int monsterX = tower.getX();
         int monsterY = tower.getY();
 
-        // Проверьте, если координаты пули и монстра совпадают
+        // Если координаты пули и монстра совпадают
         if (rocketX == monsterX && rocketY == monsterY) {
             return true;
         }
@@ -175,10 +186,10 @@ public:
         return false;
     }
 };
+
+// Класс, представляющий комнату в игре
 class Room {
 private:
-    // Класс, представляющий комнату в игре
-    // Здесь будем хранить информацию о комнате, ее размере, объектах и т. д.
     int width;
     int height;
     vector<vector<char>> roomMap;
@@ -243,34 +254,34 @@ public:
 
     // Методы для отображения объектов в комнате
     vector<vector<char>> render() {
-        // Очистите карту комнаты
+        // Очищаем карту комнаты
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 roomMap[y][x] = '.';
             }
         }
 
-        // Отрисовать объекты Barrier в комнате
+        // Отрисовываем объекты Barrier в комнате
         for (const auto& barrier : barriers) {
             roomMap[barrier.getY()][barrier.getX()] = barrier.getSymbol();
         }
 
-        // Отрисовать объекты Enemy в комнате
+        // Отрисовываем объекты Enemy в комнате
         for (const auto& enemy : enemies) {
             roomMap[enemy.getY()][enemy.getX()] = enemy.getSymbol();
         }
 
-        // Отрисовать объекты Bullet в комнате
+        // Отрисовываем объекты Bullet в комнате
         for (const auto& shot : bullets) {
             roomMap[shot.getY()][shot.getX()] = shot.getSymbol();
         }
 
-        // Отрисовать объекты Rocket в комнате
+        // Отрисовываем объекты Rocket в комнате
         for (const auto& shot : rockets) {
             roomMap[shot.getY()][shot.getX()] = shot.getSymbol();
         }
         
-        // Отрисовать объекты Chest в комнате
+        // Отрисовываем объекты Chest в комнате
         for (const auto& chest : chests) {
             roomMap[chest.getY()][chest.getX()] = chest.getSymbol();
         }
@@ -352,6 +363,7 @@ public:
         }
     }
 
+    // Проверяем, не попал ли игрок в клетку с сундуком, и при необходимости прибавляем очки
     void updateChest(Player& player) {
         for (auto chestIt = chests.begin(); chestIt != chests.end();){
             if (chestIt->isPlayerClose(player)){
@@ -380,20 +392,6 @@ public:
         }
         return monsterPointers;
     }
-    
-    /* 
-    // Передаем все указатели на снаряды на карте 
-    vector<Projectile*> getProjectiles() {
-        vector<Projectile*> shotPointers;
-        for (Projectile& shot : bullets) {
-            shotPointers.push_back(&shot);
-        }
-        for (Projectile& shot : rockets) {
-            shotPointers.push_back(&shot);
-        }
-
-        return shotPointers;
-    } */
 
 };
 
