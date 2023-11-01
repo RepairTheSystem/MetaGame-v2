@@ -1,9 +1,11 @@
-#include "Cell.h"
+#ifndef Enemy123
+#define Enemy123
 
+#include "Cell.h"
+#include "Player.h"
+#include "cstdlib"
 using namespace std;
 
-#ifndef Enemy
-#define Enemy
 
 // "Абстрактный" класс врагов
 class Enemy : public GameObject {

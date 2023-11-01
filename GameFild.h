@@ -1,14 +1,16 @@
+#ifndef Fild123
+#define Fild123
+
 #include <vector>
 #include <iostream>
 #include <thread>
 
-#include "Cell.h"
+
 #include "Contol.h"
+#include "Room.h"
+#include "Player.h"
 
 using namespace std;
-
-#ifndef Fild
-#define Fild
 
 class Game {
     // Основной класс игры

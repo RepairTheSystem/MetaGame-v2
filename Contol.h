@@ -1,10 +1,11 @@
+#ifndef Control123
+#define Control123
+
 #include <vector>
 #include <iostream>
 #include <windows.h> // Это необходимо для корректного управления, без использования сторонних библиотек
-#include "Cell.h"
+#include "Room.h"
 
-#ifndef Control
-#define Control
 
 void moveCheck(Player& player, int xOffset, int yOffset, void (Player::*moveFunction)(), Room* room) {
     int height = room->getHeight();
@@ -14,6 +15,7 @@ void moveCheck(Player& player, int xOffset, int yOffset, void (Player::*moveFunc
     bool next_cell_access = true;
     vector<vector<char>> map = room->render();
 
+    // Проверка на пустоту для перемещения 
     // Проверка на выпадение за карту
     if ((next_y <= height && next_y >= 0 && next_x <= width && next_x >= 0) == false)
         next_cell_access = false;

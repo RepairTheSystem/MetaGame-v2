@@ -2,7 +2,9 @@
 #include <vector>
 
 #include "Cell.h"
+#include "Room.h"
 #include "GameFild.h"
+
 
 using namespace std;
 
@@ -24,7 +26,7 @@ int main(){
     Game game(room1.getWidth(), room1.getHeight());
     game.setCurrentRoom(room1);
     // Основной цикл игры
-    while (true) {
+    while (true) { // в отдельный метод
         game.render();
     }
     return 0;
