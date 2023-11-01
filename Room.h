@@ -1,12 +1,11 @@
-#ifndef Room123
-#define Room123
+#ifndef GameRoom
+#define GameRoom
 
 #include "Enemy.h"
 #include "Bullet.h"
 #include "Cell.h"
 #include "Player.h"
-
-// Класс, представляющий комнату в игре
+// A class representing a room in the game
 class Room {
 private:
     int width;
@@ -23,28 +22,28 @@ private:
 public:
     Room(int width, int height) : width(width), height(height), barriers(), enemies(),
     towers(), monsters(), bullets(), rockets(), chests() {
-        // Создадим комнату заданного размера   
+        // Create a room of a given size
         roomMap = vector<vector<char>>(height, vector<char>(width, '.'));
     }
 
-    // Методы для добавления объектов Barrier в комнату
+    // Methods for adding Barrier objects to a room
     void addBarrier(int x, int y) {
         barriers.push_back(Barrier(x, y));
     }
 
-    // Методы для добавления объектов Tower в комнату
+    // Methods for adding Tower objects to a room
     void addTower(int x, int y) {
         Tower tower(x, y);
         towers.push_back(tower);
     }
 
-    // Методы для добавления объектов Monster в комнату
+    // Methods for adding Monster objects to a room
     void addMonster(int x, int y) {
         Monster monster(x, y);
         monsters.push_back(monster);
     }
 
-    // Методы для добавления объектов Bullet в комнату
+    // Methods for adding Bullet objects to a room
     void addBullet (int x, int y) {
         Bullet bullet(x, y);
         bullets.push_back(bullet);
@@ -62,7 +61,7 @@ public:
         chests.push_back(chest);
     }
 
-    // Передаем всех злых существ
+    // We pass all evil creatures
     vector<Enemy> getEnemies(){
         // Объединяем врагов из разных векторов
         enemies.clear(); // Очищаем текущий вектор
@@ -71,119 +70,120 @@ public:
         return enemies;
     }
 
-    // Методы для отображения объектов в комнате
+    // Methods for displaying objects in a room
     vector<vector<char>> render() {
-        // Очищаем карту комнаты
+        // Clearing the room map
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 roomMap[y][x] = '.';
             }
         }
 
-        // Отрисовываем объекты Barrier в комнате
+        // Drawing Barrier objects in the room
         for (const auto& barrier : barriers) {
-            roomMap[barrier.getY()][barrier.getX()] = barrier.getSymbol();
+            roomMap[barrier.getY()][barrier.getX()] = barrier.gettexture();
         }
 
-        // Отрисовываем объекты Enemy в комнате
+        // Drawing the Enemy objects in the room
         for (const auto& enemy : enemies) {
-            roomMap[enemy.getY()][enemy.getX()] = enemy.getSymbol();
+            roomMap[enemy.getY()][enemy.getX()] = enemy.gettexture();
         }
 
-        // Отрисовываем объекты Bullet в комнате
+        // Drawing Bullet objects in the room
         for (const auto& shot : bullets) {
-            roomMap[shot.getY()][shot.getX()] = shot.getSymbol();
+            roomMap[shot.getY()][shot.getX()] = shot.gettexture();
         }
 
-        // Отрисовываем объекты Rocket в комнате
+        // Drawing Rocket objects in the room
         for (const auto& shot : rockets) {
-            roomMap[shot.getY()][shot.getX()] = shot.getSymbol();
+            roomMap[shot.getY()][shot.getX()] = shot.gettexture();
         }
         
-        // Отрисовываем объекты Chest в комнате
+        // Drawing Chest objects in the room
         for (const auto& chest : chests) {
-            roomMap[chest.getY()][chest.getX()] = chest.getSymbol();
+            roomMap[chest.getY()][chest.getX()] = chest.gettexture();
         }
 
         return roomMap;
     }
 
-    // Метод для проверки состояния пули - не попала ли она в монстра, или не вышла ли за карту
+    // The method for checking the condition of the bullet is whether it hit the monster, or whether it went beyond the map
     void updateBullet() {
         for (auto bulletIt = bullets.begin(); bulletIt != bullets.end();) {
             bulletIt->moveUp();
 
             for (auto monsterIt = monsters.begin(); monsterIt != monsters.end();) {
                 if (bulletIt->isHitMonster(*monsterIt)) {
-                    // Уничтожаем монстра
+                    // Destroying the monster
                     monsterIt = monsters.erase(monsterIt);
 
-                    // Уничтожаем пулю
+                    // Destroying the bullet
                     bulletIt = bullets.erase(bulletIt);
 
-                    // Если оба итератора достигли конца, выходим из обоих циклов
+                    // If both iterators have reached the end, exit both loops
                     if (monsterIt == monsters.end() && bulletIt == bullets.end())
                         return;
                 } 
                 else {
-                    // Двигаем итератор монстра
+                    // Moving the monster iterator
                     ++monsterIt;
                 }
             }
-            // Если закончились пули - заканчиваем цикл
+            // If the bullets have run out, we end the cycle
             if (bulletIt == bullets.end()) {
                 return;
             }
-            // Удаляем пулю из массива, если она мертва
+            // Removing the bullet from the array if it is dead
             else if (!bulletIt->isAlive()) {
                 bulletIt = bullets.erase(bulletIt);
             } 
             else {
-                // Двигаем итератор пули
+                // Moving the bullet iterator
                 ++bulletIt;
             }
         }
     }   
 
-    // Метод для проверки состояния ракеты - не попала она в башню, или не вышла ли за карту
+    // Method for checking the state of the rocket - did it hit the tower, or did it go beyond the map
     void updateRocket() {
         for (auto rocketIt = rockets.begin(); rocketIt != rockets.end();) {
             rocketIt->moveUp();
 
             for (auto towerIt = towers.begin(); towerIt != towers.end();) {
                 if (rocketIt->isHitTower(*towerIt)) {
-                    // Уничтожаем башню
+                    // Destroying the tower
                     towerIt = towers.erase(towerIt);
 
-                    // Уничтожаем ракету
+                    // Destroying the rocket
                     rocketIt = rockets.erase(rocketIt);
 
-                    // Если оба итератора достигли конца, выходим из обоих циклов
+                    // If both iterators have reached the end, exit both loops
                     if (towerIt == towers.end() && rocketIt == rockets.end())
                         return;
                 }
                 else {
-                    // Двигаем итератор башни
+                    // Moving the tower iterator
                     ++towerIt;
                 }
             }
-            // Если закончились ракеты - заканчиваем цикл
+            // If the rockets have run out, we finish the cycle
             if (rocketIt == rockets.end()) {
                 return;
             }
-            // Удаляем ракету из массива, если она мертва
+            // Removing the rocket from the array if it is dead
             else if (!rocketIt->isAlive()) {
                 rocketIt = rockets.erase(rocketIt);
             } 
             else {
-                // Двигаем итератор ракеты
+                // Moving the rocket iterator
                 ++rocketIt;
             }
         }
     }
 
     
-    // Проверяем, не попал ли игрок в клетку с сундуком, и при необходимости прибавляем очки в методе класса Game
+    // Check if the player has not got into the cell with the chest, and if necessary,
+    // add points in the method of the Game class
     void updateChest(Player& player) {
         for (auto chestIt = chests.begin(); chestIt != chests.end();) {
             if (player.isChestInCell(*chestIt)) {
@@ -205,7 +205,7 @@ public:
         return height;
     }
 
-    // Метод передачи указателей на всех монстров в комнате 
+    // The method of passing pointers to all the monsters in the room
     vector<Monster*> getMonsters() {
         vector<Monster*> monsterPointers;
         for (Monster& monster : monsters) {

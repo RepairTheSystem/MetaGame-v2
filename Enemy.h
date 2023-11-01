@@ -1,5 +1,5 @@
-#ifndef Enemy123
-#define Enemy123
+#ifndef EvilCreature
+#define EvilCreature
 
 #include "Cell.h"
 #include "Player.h"
@@ -7,10 +7,10 @@
 using namespace std;
 
 
-// "Абстрактный" класс врагов
+// "Abstract" enemy class
 class Enemy : public GameObject {
 public:
-    Enemy(int x, int y, char symbol) : GameObject(x, y, symbol) {};
+    Enemy(int x, int y, char texture) : GameObject(x, y, texture) {};
 
     // Проверяем, не подошел ли игрок слишком близко к врагу
     bool isEnemyClose(Player &player){
@@ -20,21 +20,21 @@ public:
     }
 };
 
-// Класс Башен - одного из возмжоных врагов
+// Tower Class - one of the possible enemies
 class Tower : public Enemy {
 public: 
     Tower(int x, int y): Enemy(x, y, 'T') {};
 };
 
-// Класс монстров - одного из возможных врагов
+// Monster class - one of the possible enemies
 class Monster : public Enemy {
 public:
     Monster(int x, int y) : Enemy(x, y, 'M') {}
 
-    // Метод для случайного движения монстра
+    // Method for random monster movement
     void moveRandom() {
-        // Будем генерировать случайное число от 1 до 3-х, и в зависимости от числа
-        // Будем моделировать шаги монстра
+        // We will generate a random number from 1 to 3, and depending on the number
+        // We will simulate the steps of the monster
         int moveSeed = rand() % 3;
         if(moveSeed == 0)
             moveUp();

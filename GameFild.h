@@ -1,10 +1,9 @@
-#ifndef Fild123
-#define Fild123
+#ifndef GameFild
+#define GameFild
 
 #include <vector>
 #include <iostream>
 #include <thread>
-
 
 #include "Contol.h"
 #include "Room.h"
@@ -12,8 +11,8 @@
 
 using namespace std;
 
+// Main class of the game
 class Game {
-    // Основной класс игры
 private:
     int width;
     int height;
@@ -21,63 +20,72 @@ private:
     Player player;
     Room* currentRoom;
 public:
+    // Creating a game map
     Game(int width, int height) : width(width), height(height), player(1, 1) {
-        // Создаем карту игры
         map = vector<vector<char>>(height, vector<char>(width, '.'));
         currentRoom = nullptr;
     }
     
-    // Метод задающий текущую комнату
+    // The method that sets the current room
     void setCurrentRoom(Room& room) {
         currentRoom = &room;
     }
 
+    // The method that calculates the map update 
     void render() {
         system("cls");
-        // Отрисовываем карту игры и игрока
-        // Отображаем текущую комнату и ее наполнение 
+        //Drawing the map of the game and the player
+        // Displays the current room and its contents
         if (currentRoom != nullptr) {
             map = currentRoom->render();
         }
 
-        map[player.getY()][player.getX()] = player.getSymbol();
+        map[player.getY()][player.getX()] = player.gettexture();
         
-        // Перебираем врагов и проверяем, не слишком ли они близко к игроку
+        // We sort through the enemies and check if they are too close to the player
         for (Enemy enemy : currentRoom->getEnemies()) {
             if (enemy.isEnemyClose(player)) {
-                // Враг слишком близко к игроку, меняем символ и останавливаем игру
+                // The enemy is too close to the player, change the symbol and stop the game
                 map[player.getY()][player.getX()] = 'D';
                 cout << "Game Over!" << endl;
                 
                 cin.get();
-                exit(0); // Останавливаем игру
+                exit(0); // Stopping the game
             }
         }
         
-        // Передвигаем выстрелы вверх
+        // Moving the shots up
         currentRoom->updateBullet();
         currentRoom->updateRocket();
 
-        // Обновляем сундуки 
+        // Updating chests
         currentRoom->updateChest(player);
 
-        // Применяем рандомное передвижение монстров
+        // Randomly move monsters
         for (Monster* monster : currentRoom->getMonsters()) {
             monster->moveRandom();
         }
 
-        // Отобразим карту игры
+        // Display the game map
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 cout << map[y][x];
             }
             cout << endl;
         }
-        // Выводим счет игрока
+        // We output the player's account
         cout << "Score: " << player.getScore();
         PlayerInput(player, currentRoom);
         this_thread::sleep_for(chrono::milliseconds(300));
     }
+
+    // The method that starts the game cycle
+    void start(){
+        while (true){
+            render();
+        }
+    }
+
 };
 
 #endif

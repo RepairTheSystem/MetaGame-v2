@@ -5,32 +5,32 @@
 using namespace std;
 
 
-// Этот класс будет представлять базовый объект в игре
-// В нем можно хранить информацию о позиции, символе отображения и др.
+// This class will represent the base object in the game
+// It can store information about the position, display symbol, etc.
 class GameObject {
 private:
     int x;
     int y;
-    char symbol;
+    char texture;
 public:
-    GameObject(int x, int y, char symbol) : x(x), y(y), symbol(symbol) {}
+    GameObject(int x, int y, char texture) : x(x), y(y), texture(texture) {}
 
     int getX() const { return x; }
     int getY() const { return y; }
-    char getSymbol() const { return symbol; }
+    char gettexture() const { return texture; }
 
     void setX(int x) { this->x = x; }
     void setY(int y) { this->y = y; }
     
 };
 
-// Класс Препятствий
+// Obstacle Class
 class Barrier : public GameObject {
 public:
     Barrier(int x, int y) : GameObject(x, y, '#') {};
 };
 
-// Класс Сундуков
+// Chest Class
 class Chest : public GameObject {
 private:
     int score;

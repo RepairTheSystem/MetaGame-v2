@@ -3,12 +3,12 @@
 #ifndef Character
 #define Character
 
-// Класс игрока
+// Player Class
 class Player : public GameObject {
 private: int score;
 public:
     Player(int x, int y) : GameObject(x, y, 'P'), score(0) {};
-    // Методы для обновления позиции игрока
+    // Methods for updating a player's position
     void moveUp() { 
         int currentY = getY();
         setY(currentY-1); 
@@ -25,7 +25,7 @@ public:
         int currentX = getX();
         setX(currentX-1); 
     }
-    // Методы для работы с счетом игрока
+    // Methods for working with a player's score
     int getScore() const {
         return score;
     }
@@ -33,6 +33,7 @@ public:
         int newScore = givenScore + getScore();
         score = newScore;
     }
+    // a method for checking a chest in a cage with a player
     bool isChestInCell (Chest& chest) {
         int chestX = chest.getX();
         int chestY = chest.getY();
